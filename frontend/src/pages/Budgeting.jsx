@@ -1,0 +1,15 @@
+import React from "react";
+import Navbar from "../components/Navbar";
+
+const Budgeting = () => {
+  return (
+    <div className='overflow-y-auto no-scrollbar h-screen'>
+      <Navbar />
+      <div className="flex justify-center items-center">
+        <h1 className="text-black text-2xl">Bugeting</h1>
+      </div>
+    </div>
+  );
+};
+
+export default Budgeting;
