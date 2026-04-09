@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.jpg";
+import toast from "react-hot-toast"
 
 const ForgotPassword = () => {
   return (

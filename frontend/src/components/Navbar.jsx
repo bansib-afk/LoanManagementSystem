@@ -1,23 +1,51 @@
 import React, { useState } from "react";
 import logo from "../assets/preview.jpg";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/authApi";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
   const [isOpen, setIsOpen] = useState(false);
-  const [active, setActive] = useState("Home");
 
-  const menuItems = [
-    { name: "Home", path: "/" },
-    { name: "Schemes", path: "/schemes" },
-    { name: "Consultancy", path: "/consultancy" },
-    { name: "Budgeting", path: "/budgeting" },
-    { name: "Loan Hub", path: "/loan-hub" },
-    { name: "About Us", path: "/about" },
-  ];
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      toast.success("Logout Successful");
+
+      navigate("/");
+
+    } catch (err) {
+      toast.error("Logout Failed");
+      console.log(err);
+    }
+  };
+
+  const menuItems = user
+    ? [
+        { name: "Schemes", path: "/schemes" },
+        { name: "Consultancy", path: "/consultancy" },
+        { name: "Budgeting", path: "/budgeting" },
+        { name: "Loan Hub", path: "/loan-hub" },
+        { name: "About Us", path: "/about" },
+      ]
+    : [
+        { name: "Home", path: "/" },
+        { name: "Schemes", path: "/schemes" },
+        { name: "Consultancy", path: "/consultancy" },
+        { name: "Budgeting", path: "/budgeting" },
+        { name: "Loan Hub", path: "/loan-hub" },
+        { name: "About Us", path: "/about" },
+      ];
+
   return (
     <nav className="sticky top-0 z-50 bg-black text-white border-b border-gray-800">
       <div className="max-w-8xl mx-auto px-4 md:px-14 py-3 flex justify-between items-center">
-        
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
           <img
@@ -55,16 +83,27 @@ const Navbar = () => {
         </div>
         {/* Desktop Buttons */}
         <div className="hidden xl:flex space-x-4">
-          <Link to="/login">
-            <button className="border border-white px-4 py-1 rounded hover:bg-white hover:text-black transition">
-              Login
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="bg-white text-black px-4 py-1 rounded hover:bg-gray-200 transition"
+            >
+              Logout
             </button>
-          </Link>
-          <Link to="/register">
-            <button className="bg-white text-black px-4 py-1 rounded hover:bg-gray-200 transition">
-              Register
-            </button>
-          </Link>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="border border-white px-4 py-1 rounded hover:bg-white hover:text-black transition">
+                  Login
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="bg-white text-black px-4 py-1 rounded hover:bg-gray-200 transition">
+                  Register
+                </button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -92,19 +131,28 @@ const Navbar = () => {
               {item.name}
             </NavLink>
           ))}
-          
 
-          <Link to="/login">
-            <button className="w-full border border-white py-2 my-4 rounded hover:bg-white hover:text-black transition">
-              Login
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="w-full bg-white text-black py-2 rounded hover:bg-gray-200 transition"
+            >
+              Logout
             </button>
-          </Link>
-          <Link to="/register">
-            <button className="w-full bg-white text-black py-2 rounded hover:bg-gray-200 transition">
-              Register
-            </button>
-          </Link>
-          
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="w-full border border-white py-2 my-4 rounded hover:bg-white hover:text-black transition">
+                  Login
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="w-full bg-white text-black py-2 rounded hover:bg-gray-200 transition">
+                  Register
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
