@@ -1,7 +1,51 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import toast from "react-hot-toast"
+import { Link, useNavigate } from 'react-router-dom'
 import logo from "../assets/logo.jpg";
+import { registerUser } from '../api/authApi';
+import { useState, useEffect } from 'react';
+
+
 const Register = () => {
+
+  const navigate = useNavigate()
+  
+   useEffect(() => {
+      const user = JSON.parse(localStorage.getItem("user"))
+  
+      if(user){
+        navigate("/schemes")
+      }
+    }, [])
+
+  const [ formData , setFormData ] = useState({
+    name : "",
+    email : "",
+    password : "",
+    role : "",
+    confirmPassword : ""
+  })
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData, 
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await registerUser(formData);
+
+    toast.success(res.data.message || "Registered Successfully !");
+    navigate("/login");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Error");
+  }
+};
+
+
   return (
      <div className="min-h-screen lg:py-2 xl:py-5 bg-black text-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
       
@@ -30,13 +74,14 @@ const Register = () => {
         </h2>
 
         {/* Form */}
-        <form className="space-y-4 sm:space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 
           {/* Name */}
           <div>
             <label className="text-xs sm:text-sm text-gray-400">Full Name</label>
             <input
-              type="text"
+            onChange={handleChange}
+              type="text" name='name'
               placeholder="Enter your name"
               className="w-full mt-1 px-3 sm:px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white transition"
             />
@@ -46,7 +91,8 @@ const Register = () => {
           <div>
             <label className="text-xs sm:text-sm text-gray-400">Email</label>
             <input
-              type="email"
+              type="email" name='email'
+              onChange={handleChange}
               placeholder="Enter your email"
               className="w-full mt-1 px-3 sm:px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white transition"
             />
@@ -55,7 +101,7 @@ const Register = () => {
           {/* Role Dropdown */}
           <div>
             <label className="text-xs sm:text-sm text-gray-400">Select Role</label>
-            <select
+            <select name='role' onChange={handleChange}
               className="w-full mt-1 px-3 sm:px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white transition"
             >
               <option value="">Choose role</option>
@@ -69,6 +115,8 @@ const Register = () => {
           <div>
             <label className="text-xs sm:text-sm text-gray-400">Password</label>
             <input
+            name='password'
+            onChange={handleChange}
               type="password"
               placeholder="Create password"
               className="w-full mt-1 px-3 sm:px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white transition"
@@ -80,6 +128,8 @@ const Register = () => {
             <label className="text-xs sm:text-sm text-gray-400">Confirm Password</label>
             <input
               type="password"
+              name='confirmPassword'
+                onChange={handleChange}
               placeholder="Confirm password"
               className="w-full mt-1 px-3 sm:px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white transition"
             />

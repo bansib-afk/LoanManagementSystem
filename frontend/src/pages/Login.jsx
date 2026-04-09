@@ -1,8 +1,51 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
+import { loginUser } from "../api/authApi";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast"
 
 const Login = () => {
+
+  const navigate = useNavigate()
+
+  
+    useEffect(() => {
+      const user = JSON.parse(localStorage.getItem("user"))
+  
+      if(user){
+        navigate("/schemes")
+      }
+    }, [])
+
+  const [formData, setFormData ] = useState({
+    email : "",
+    password : ""
+  })
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData, 
+      [e.target.name] : e.target.value
+    })
+  }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await loginUser(formData);
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    toast.success("Login Successful")
+    navigate("/schemes");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login Failed");
+  }
+};
+
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
       {/* Card */}
@@ -31,12 +74,14 @@ const Login = () => {
         </h2>
 
         {/* Form */}
-        <form className="space-y-4 sm:space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           {/* Email */}
           <div>
             <label className="text-xs sm:text-sm text-gray-400">Email</label>
             <input
               type="email"
+              name="email"
+              onChange={handleChange}
               placeholder="Enter your email"
               className="
                 w-full mt-1 px-3 sm:px-4 py-2 
@@ -54,6 +99,8 @@ const Login = () => {
             <label className="text-xs sm:text-sm text-gray-400">Password</label>
             <input
               type="password"
+              name="password"
+              onChange={handleChange}
               placeholder="Enter your password"
               className="
                 w-full mt-1 px-3 sm:px-4 py-2 
