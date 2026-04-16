@@ -1,46 +1,116 @@
+import User from "../models/User.js";
+import Token from "../models/Token.js";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js"
 
-// 🔐 Protect Route (Authentication)
+// // 🔐 Protect Route (Authentication)
+// export const protect = async (req, res, next) => {
+//   const authHeader = req.headers.authorization;
+
+//   // Check token exists
+//   if (!authHeader || !authHeader.startsWith("Bearer")) {
+//     return res.status(200).json({
+//       success: false,
+//       redirect: "/login",
+//     });
+//   }
+
+//   try {
+//     // Extract token
+//     const token = authHeader.split(" ")[1];
+
+//     const tokenDoc = await Token.findOne({
+//       accessToken: token,
+//       isValid: true,
+//     });
+
+//     if (!tokenDoc) {
+//       return res.status(200).json({
+//         success: false,
+//         redirect: "/login",
+//       });
+//     }
+
+//     // 🔥 Check user exists in DB
+//     const user = await User.findById(tokenDoc._id).select("-password");
+
+//     if (!user) {
+//       return res.status(200).json({
+//         success: false,
+//         redirect: "/login",
+//       });
+//     }
+
+//     // Attach fresh user data
+//     req.user = user;
+
+//     next();
+//   } catch (error) {
+//     return res.status(200).json({
+//       success: false,
+//       redirect: "/login",
+//     });
+//   }
+// };
+
 export const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Check token exists
+  // 1️⃣ No token
   if (!authHeader || !authHeader.startsWith("Bearer")) {
-    return res.status(401).json({
+    return res.status(200).json({
       success: false,
-      message: "No token, authorization denied",
+      redirect: "/login",
     });
   }
 
   try {
-    // Extract token
     const token = authHeader.split(" ")[1];
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
+    // 2️⃣ Check token in DB
+    const tokenDoc = await Token.findOne({
+      accessToken: token,
+      isValid: true,
+    });
 
-    // 🔥 Check user exists in DB
-    const user = await User.findById(decoded.id).select("-password");
-
-    if (!user) {
-      return res.status(401).json({
+    if (!tokenDoc) {
+      return res.status(200).json({
         success: false,
-        message: "User not found (maybe deleted)",
+        redirect: "/login",
       });
     }
 
-    // Attach fresh user data
-    req.user = user;
+    // 3️⃣ Decode token (NO verification)
+    const decoded = jwt.decode(token);
 
+    if (!decoded || !decoded.id) {
+      return res.status(200).json({
+        success: false,
+        redirect: "/login",
+      });
+    }
+
+    // 4️⃣ Get user from decoded ID
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(200).json({
+        success: false,
+        redirect: "/login",
+      });
+    }
+
+    req.user = user;
     next();
+
   } catch (error) {
-    return res.status(401).json({
+    return res.status(200).json({
       success: false,
-      message: "Invalid or expired token",
+      redirect: "/login",
     });
   }
 };
+
+
 // 🔐 Role-Based Authorization
 export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
