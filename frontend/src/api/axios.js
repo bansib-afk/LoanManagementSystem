@@ -8,7 +8,6 @@ const API = axios.create({
 // 🔐 Attach token automatically
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
-  //  console.log("TOKEN:", token);
 
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
@@ -16,5 +15,24 @@ API.interceptors.request.use((req) => {
 
   return req;
 });
+
+// 🔥 Handle redirect from backend
+API.interceptors.response.use(
+  (res) => {
+    if (res.data?.redirect) {
+      // Clear local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Redirect to login
+      window.location.href = res.data.redirect;
+    }
+
+    return res;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default API;

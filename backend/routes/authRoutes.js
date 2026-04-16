@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   refreshToken,
+  forceLogout
 } from "../controllers/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -17,5 +18,7 @@ router.post("/refresh", refreshToken); // 🔥 important
 
 // Protected Route
 router.post("/logout", protect, logoutUser);
+
+router.post("/force-logout", forceLogout)
 
 export default router;

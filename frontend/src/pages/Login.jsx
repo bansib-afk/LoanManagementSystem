@@ -29,17 +29,28 @@ const Login = () => {
     })
   }
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
     const res = await loginUser(formData);
 
+    // 🔥 If backend sends redirect, interceptor handles it
+    if (res.data.redirect) return;
+
+    // Safety check
+    if (!res.data?.accessToken) {
+      toast.error("Login failed");
+      return;
+    }
+
+    // Store data
     localStorage.setItem("token", res.data.accessToken);
     localStorage.setItem("user", JSON.stringify(res.data.user));
 
-    toast.success("Login Successful")
+    toast.success("Login Successful");
     navigate("/schemes");
+
   } catch (err) {
     toast.error(err.response?.data?.message || "Login Failed");
   }

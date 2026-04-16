@@ -11,6 +11,6 @@ export const loginUser = (data) => {
 };
 
 // Logout API
-export const logoutUser = (data) => {
-    return API.post("/auth/logout", data)
+export const logoutUser = () => {
+    return API.post("/auth/logout")
 }
