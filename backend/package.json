@@ -1,11 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon --exec ts-node --loader ts-node/esm index.ts",
+    "dev1": "npx concurrently \"tsc --watch\" \"node --watch dist/src/index.js\"",
+        "test1": "tsc && node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,14 @@
     "mongoose": "^9.4.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   }
 }
