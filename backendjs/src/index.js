@@ -1,20 +1,16 @@
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import express from "express"
-
+import express from "express";
 
 // 🔹 Routes
-import authRoutes from "./routes/authRoutes.ts";
-import adminRoutes from "./routes/adminRoutes.ts";
-import userRoutes from "./routes/userRoutes.ts";
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // 🔹 Middleware
-import { errorHandler } from "./middleware/errorMiddleware.ts";
-import connectDB from "./config/db.ts";
-import type { Application, Request, Response } from "express";
-
-// 🔹 Middleware
+import { errorHandler } from "./middleware/errorMiddleware.js";
+import connectDB from "./config/db.js";
 
 // 🔹 Load environment variables
 dotenv.config();
@@ -22,20 +18,18 @@ dotenv.config();
 // 🔹 Connect Database
 connectDB();
 
-const app: Application = express();
+const app = express();
 
 // 🔹 Core Middleware
 app.use(express.json());
 app.use(cookieParser());
 
 // 🔹 CORS Configuration
-
-
 app.use(
   cors({
-    origin: process.env.VITE_API_URL_TS as string,
+    origin: process.env.VITE_API_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -46,10 +40,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 
 // 🔹 Health Check Route
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Backend Running Successfully...",
+    message: "Backend of Javascript Running Successfully...",
   });
 });
 
@@ -57,7 +51,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use(errorHandler);
 
 // 🔹 Start Server
-const PORT: number = Number(process.env.PORT) || 5001;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
