@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import express from "express";
 
+
+// 🔹 Load environment variables
+dotenv.config();
 // 🔹 Routes
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -12,8 +15,6 @@ import userRoutes from "./routes/userRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import connectDB from "./config/db.js";
 
-// 🔹 Load environment variables
-dotenv.config();
 
 // 🔹 Connect Database
 connectDB();
@@ -29,7 +30,7 @@ app.use(
   cors({
     origin: process.env.VITE_API_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
